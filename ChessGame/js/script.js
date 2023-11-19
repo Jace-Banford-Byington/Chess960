@@ -47,7 +47,7 @@ $(document).on("click", function (event) {
 });
 
 function calculatePos(pieceId) {
-    var cellID = $("#" + pieceId).parent('div').attr('id');
+    var cellID = $("#" + pieceId).parent('div').attr('id').replace(/\0/g, '');
 
     if (previousMovedPiece !== null && pieceId.includes(previousMovedPiece.type)) {
         return;
@@ -245,6 +245,7 @@ function createNewBlackPawn(pieceId, cellID) {
 function createNewWhitePawn(pieceId, cellID) {
     for (var i = 0; i < arrMovedWhitePawnList.length; i++) {
         var pawn = arrMovedWhitePawnList[i];
+        
         if (pawn.id === pieceId) {
             return pawn;
         }
@@ -285,18 +286,22 @@ function createNewWhiteKnight(pieceId, cellID) {
 }
 
 /**-----------------------Piece Object-----------------------**/
-function Piece(id, type, currentPosition) {
-    this.id = id;
-    this.type = type;
-    this.currentPosition = currentPosition;
+class Piece {
+    constructor(id, type, currentPosition) {
+        this.id = id;
+        this.type = type;
+        this.currentPosition = currentPosition;
 
-    this.isFirstMove = true;
-    this.positionsToBeMoved = [];
-    this.obstaclesCanBeKilled = [];
+        this.isFirstMove = true;
+        this.positionsToBeMoved = [];
+        this.obstaclesCanBeKilled = [];
+    }
 }
 
 //Pawn
 function calculatePathAhead(obj) {
+    console.log("Object:", obj);
+
     selectedPiece = obj;
     colorPawnKillCell(obj);
     if (obj.type === "white") {
@@ -339,6 +344,8 @@ function calculatePathAhead(obj) {
 
 //bishop, queen, king and Knight
 function calculatePathTopLeft(obj) {
+    console.log("Object:", obj);
+
     selectedPiece = obj;
     var offset = $("#" + obj.currentPosition).offset();
     var x = offset.left - 65;
@@ -373,6 +380,8 @@ function calculatePathTopLeft(obj) {
 }
 
 function calculatePathTopRight(obj) {
+    console.log("Object:", obj);
+
     selectedPiece = obj;
     var offset = $("#" + obj.currentPosition).offset();
     var x = offset.left + 65;
@@ -407,6 +416,8 @@ function calculatePathTopRight(obj) {
 }
 
 function calculatePathBottomLeft(obj) {
+    console.log("Object:", obj);
+
     selectedPiece = obj;
     var offset = $("#" + obj.currentPosition).offset();
     var x = offset.left - 65;
@@ -441,6 +452,8 @@ function calculatePathBottomLeft(obj) {
 }
 
 function calculatePathBottomRight(obj) {
+    console.log("Object:", obj);
+
     selectedPiece = obj;
     var offset = $("#" + obj.currentPosition).offset();
     var x = offset.left + 65;
@@ -475,6 +488,7 @@ function calculatePathBottomRight(obj) {
 
 //for castle queen and king
 function calculatePathTop(obj) {
+    console.log("Object:", obj);
     selectedPiece = obj;
     var offset = $("#" + obj.currentPosition).offset();
     var x = offset.left;
@@ -499,6 +513,8 @@ function calculatePathTop(obj) {
 }
 
 function calculatePathRight(obj) {
+    console.log("Object:", obj);
+
     selectedPiece = obj;
     var offset = $("#" + obj.currentPosition).offset();
     var x = offset.left + 65;
@@ -524,6 +540,8 @@ function calculatePathRight(obj) {
 }
 
 function calculatePathLeft(obj) {
+    console.log("Object:", obj);
+
     selectedPiece = obj;
     var offset = $("#" + obj.currentPosition).offset();
     var x = offset.left - 65;
@@ -548,6 +566,8 @@ function calculatePathLeft(obj) {
 }
 
 function calculatePathBottom(obj) {
+    console.log("Object:", obj);
+
     selectedPiece = obj;
     var offset = $("#" + obj.currentPosition).offset();
     var x = offset.left;
@@ -582,7 +602,7 @@ function move(obj, cell) {
             obj.isFirstMove = false;
         }
     }
-    isKingChecked(obj.type === "white" ? "black" : "white");
+    // isKingChecked(obj.type === "white" ? "black" : "white");
     obj.positionsToBeMoved = [];
 }
 
