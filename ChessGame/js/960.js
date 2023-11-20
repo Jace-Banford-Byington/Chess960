@@ -1,19 +1,42 @@
+
+// Variable to store the initial positions
+var initialPositions;
+
+// Function to generate the initial positions
+function generateInitialPositions() {
+    // Call generate960Position to generate initial layout
+    return generate960Position();
+}
+
+// Function to get the current positions
+function getCurrentPositions() {
+    // If initialPositions is not defined, generate it
+    if (!initialPositions) {
+        initialPositions = generateInitialPositions();
+    }
+
+    // Return a copy of the initial positions
+    return [...initialPositions];
+}
 function resetBoard(generateNewLayout) {
     // Reset everything on the page
 
-    // Call generateChess960Position to generate a new layout only if the parameter is true
+    // Call generate960Position to generate a new layout only if the parameter is true
     var newPositions = generateNewLayout ? generate960Position(true) : getCurrentPositions();
 
     // Update board and pieces
-    updateBoard(newPositions);
-}
+    if (generateNewLayout) {
+        updateBoard(newPositions);
+    }}
 
 
 function generate960Position(buttonClicked) {
     if (buttonClicked) {
         console.log("Generating Positions");
-        generatingPositions = true;
+        // Set initialPositions to null to force regeneration
+        initialPositions = null;
     }
+
     // Array to represent the possible positions of the back rank pieces
     var backRankPositions = [1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -32,46 +55,9 @@ function generate960Position(buttonClicked) {
             [backRankPositions[i], backRankPositions[j]] = [backRankPositions[j], backRankPositions[i]];
         }
     }
-    generatingPositions = false;
+
     return backRankPositions;
 }
-
-
-function getCurrentPositions(){
-    var currentPosition = {};
-
-    // Iterate over each cell in the chessboard
-   $('.cell').each(function () {
-        var cellId = $(this).attr('id');
-        var pieceElement = $(this).find('.piece');
-
-        // Check if there's a piece in the cell
-        if (pieceElement.length) {
-            var pieceId = pieceElement.attr('id');
-
-            // Extract row and column information from the cellId
-            var row = cellId.charAt(5);
-            var col = cellId.charAt(6);
-
-            // Extract color and piece type information from the pieceId
-            var color = pieceId.charAt(2) === 'w' ? 'white' : 'black';
-            var type = pieceId.split('-')[2];
-
-            // Build the current position object
-            currentPosition[cellId] = {
-                color: color,
-                type: type,
-                row: row,
-                col: col
-            };
-        } else {
-            console.warn("No piece found in cell:", cellId);
-        }
-    });
-
-    return currentPosition;
-}
-
 
 function updateBackRank(pieceId, newPosition) {
     // Update the position of the piece with the new Chess960 position
@@ -138,14 +124,10 @@ function updatePiece(pieceId, newPosition) {
 
         // Set the new offset
         pieceElement.offset({ left: newX, top: newY });
-        
-        // Update the pieceId variable with the new id
-        pieceId = cellId;
     } else {
         console.error("Piece or cell element not found!", "Piece ID:", pieceId, "Cell ID:", cellId);
     }
 }
-
 
 
 // Call resetBoard to initialize the board with a random Chess960 layout
