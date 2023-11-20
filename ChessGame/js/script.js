@@ -23,6 +23,27 @@ var whiteKing = null;
 var selectedPiece = null;
 var previousMovedPiece = null;
 
+// Add a list to keep track of occupied cells
+var occupiedCells = [];
+
+// Function to check if a cell is occupied
+function isCellOccupied(cellID) {
+    return occupiedCells.includes(cellID);
+}
+
+// Function to update the occupied cells list
+function updateOccupiedCells(piece, cell) {
+    // Remove the piece from its previous cell if it exists
+    if (piece.currentPosition) {
+        occupiedCells = occupiedCells.filter(cell => cell !== piece.currentPosition);
+    }
+
+    // Add the piece to the new cell
+    occupiedCells.push(cell);
+}
+
+
+
 /**-------------------Receives click events-------------**/
 $(document).on("click", function (event) {
     var x = event.pageX;
@@ -589,21 +610,54 @@ function calculatePathBottom(obj) {
         }
     }
 }
+// Function to generate a random integer between min and max (inclusive)
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Function to get a random cell ID on the board
+function getRandomCell() {
+    // Assuming your board has rows from 1 to 8 and columns from A to H
+    var randomRow = getRandomInt(1, 8);
+    var randomCol = String.fromCharCode(getRandomInt(65, 72)); // A to H
+
+    return "cell-" + (randomCol + randomRow);
+}
 
 /**All pieces**/
 function move(obj, cell) {
+  // Check if the cell is occupied
+  if (isCellOccupied($(cell).attr('id'))) {
+    // Find a new random cell that is not occupied
+    var newCell;
+    do {
+        newCell = getRandomCell();
 
-    for (var i = 0; i < obj.positionsToBeMoved.length; i++) {
-        if (obj.positionsToBeMoved[i] === cell) {
-            $("#" + obj.id).appendTo(cell);
-            refreshCells(obj);
-            obj.currentPosition = $(cell).attr('id');
-            previousMovedPiece = obj;
-            obj.isFirstMove = false;
-        }
-    }
-    // isKingChecked(obj.type === "white" ? "black" : "white");
-    obj.positionsToBeMoved = [];
+    }while (isCellOccupied(newCell));
+
+    // Update the occupied cells list
+    updateOccupiedCells(obj, newCell);
+
+    // Move the piece to the new cell
+    $("#" + obj.id).appendTo(newCell);
+    refreshCells(obj);
+    obj.currentPosition = newCell;
+    previousMovedPiece = obj;
+    obj.isFirstMove = false;
+} else {
+    // Update the occupied cells list
+    updateOccupiedCells(obj, $(cell).attr('id'));
+
+    // Move the piece to the selected cell
+    $("#" + obj.id).appendTo(cell);
+    refreshCells(obj);
+    obj.currentPosition = $(cell).attr('id');
+    previousMovedPiece = obj;
+    obj.isFirstMove = false;
+}
+
+obj.positionsToBeMoved = [];
+// isKingChecked(obj.type === "white" ? "black" : "white");
 }
 
 function killOppositePiece(obj, clickedPiece) {
